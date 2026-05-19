@@ -1,88 +1,86 @@
-# Agentic Beacon Starter Warehouse
+# Your Organization Agentic Engineering Warehouse
 
-A ready-to-use example warehouse for experimenting with [Agentic Beacon](https://github.com/Shadowsong27/agentic-beacon).
+Centralized repository for coding standards, knowledge, and skills used by AI agents across Your Organization.
 
-It comes with pre-written context files for common stacks (Python, TypeScript, React, Go) so you can try the full sync workflow without writing anything from scratch.
+Under the current Agentic Beacon model, this warehouse clone is the **single write entrypoint** for every harness artifact on a developer's machine. Projects reference it via per-file symlinks under `.agentic-beacon/artifacts/`. See [single-warehouse-write-entrypoint](knowledge/decisions/single-warehouse-write-entrypoint.md) if this document is scaffolded with that decision.
 
-> **This is a local-only warehouse.** Clone it to your machine and connect via `abc warehouse connect --path`. Remote connections are not supported — this is by design, so that `abc contribute` can version-control your improvements via git.
+## Quick Start
 
-## Getting Started
-
-**1. Install the Agentic Beacon CLI**
+### For Developers
 
 ```bash
-# Recommended
+# 1. Install the Agentic Beacon CLI (once per machine; macOS/Linux only)
 uv tool install agentic-beacon
 
-# Or with pipx
-pipx install agentic-beacon
+# 2. Clone this warehouse locally (stays on disk; projects symlink into it)
+git clone <this-repo-url> ~/path/to/this-warehouse
 
-# Verify
-abc --version
-```
-
-> See the [full installation guide](https://github.com/Shadowsong27/agentic-beacon?tab=readme-ov-file#installation) for offline/bundle installs.
-
-**2. Clone this warehouse**
-
-```bash
-git clone https://github.com/Shadowsong27/agentic-beacon-starter-warehouse.git ~/agentic-beacon-starter-warehouse
-```
-
-**3. Connect your project**
-
-```bash
+# 3. In your project, connect to this warehouse
 cd ~/my-project
-abc warehouse connect --path ~/agentic-beacon-starter-warehouse
+abc warehouse connect --path ~/path/to/this-warehouse
+
+# 4. Create your artifact config and sync
+abc setup             # creates .agentic-beacon/beacon.yaml
+abc adopt             # select relevant warehouse artifacts (including agents)
+abc sync              # creates symlinks into the warehouse clone
 ```
 
-**4. Declare what you want and sync**
+### For Contributors
 
 ```bash
-abc setup --manual   # creates .agentic-beacon/beacon.yaml — edit to pick contexts/skills
-abc sync             # copies artifacts into your project and wires your agent config
+# Edit an artifact through any project's symlink (writes land in the warehouse working tree)
+$EDITOR ~/my-project/.agentic-beacon/artifacts/knowledge/python/type-hints.md
+
+# See what changed (scoped to your project's beacon.yaml)
+abc warehouse status
+
+# Commit and optionally push
+abc warehouse contribute -m "python: clarify type hints" --push
 ```
 
-## What's Included
+Alternatively, edit files directly in the warehouse clone and commit with plain `git`.
 
-### Contexts
+After your changes are pushed, teammates pull the warehouse and the content is immediately visible through their existing project symlinks — no per-project `abc sync` required (unless `beacon.yaml` itself changed).
 
-Pre-written boot instructions loaded automatically by your AI agent at session start.
+### Offline / Private Install
 
-| File | Description |
-|------|-------------|
-| `contexts/global.md` | Universal engineering standards (commits, code review, DRY, testing) |
-| `contexts/python.md` | Python conventions (type hints, Pydantic, ruff, uv) |
-| `contexts/typescript.md` | TypeScript conventions (strict mode, Zod, no `any`) |
-| `contexts/react.md` | React conventions (functional components, hooks patterns) |
-| `contexts/go.md` | Go conventions (error handling, interfaces, formatting) |
+Download the bundle zip for your platform from the [Releases page](<releases-url>):
 
-### Knowledge
-
-Example structure for capturing decisions, lessons, and facts — ready for you to populate.
-
-### Skills
-
-Includes the `record-knowledge` skill for systematically capturing new knowledge during agent sessions.
-
-## Day-to-day Workflow
-
-Once connected and synced, the ongoing loop is:
-
-```
-1. abc sync        — pull latest artifacts from the warehouse into your project
-2. code with agent — agent uses the synced contexts, knowledge, and skills
-3. abc delta       — see what has drifted locally
-4. abc contribute  — promote valuable changes back to the warehouse
+```bash
+unzip agentic_beacon-X.Y.Z-bundle-<platform>.zip -d abc-bundle
+uv tool install agentic-beacon --no-index --find-links ./abc-bundle/
 ```
 
-## Customising for Your Team
+## Structure
 
-Fork this repo and make it your own:
+- **`contexts/`** — Boot instructions loaded by agents at session start
+- **`knowledge/`** — Atomic decisions, lessons, and facts organized by scope
+- **`skills/`** — Reusable workflows and procedures (agent slash commands)
+- **`agents/`** — Project-scoped sub-agent profiles wired via `abc adopt` / `abc sync`
+- **`docs/`** — Warehouse documentation and contribution guides
 
-- Edit context files to reflect your team's actual standards
-- Add knowledge entries as decisions and lessons accumulate
-- Add skills for your team's recurring workflows
-- Push to your own git host and share the clone URL with your team
+## CLI Reference
 
-See the [Agentic Beacon docs](https://github.com/Shadowsong27/agentic-beacon) for the full guide.
+| Command | Description |
+|---------|-------------|
+| `abc warehouse connect --path <path>` | Connect a project to this warehouse clone |
+| `abc setup` | Create `beacon.yaml` for a project |
+| `abc sync` | Create symlinks into the warehouse clone for every declared artifact |
+| `abc sync --dry-run` | Preview the sync operations without touching the filesystem |
+| `abc adopt` | Interactively select warehouse artifacts (including agents) to wire |
+| `abc warehouse status` | Show uncommitted warehouse edits (scoped by `beacon.yaml`) |
+| `abc warehouse contribute -m "…" [--push]` | Commit warehouse edits and optionally push |
+
+**Platform support:** macOS and Linux only. Windows is not supported by `abc sync`.
+
+## Documentation
+
+- [Contribution Guide](./docs/contribution-guide.md) — How to add content
+
+## Maintenance
+
+This warehouse is maintained by Your Organization's Platform Team.
+
+- **Review Frequency:** Quarterly
+- **Questions:** Contact platform-team@example.com
+- **Issues:** Open an issue in this repository

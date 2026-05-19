@@ -24,3 +24,11 @@ venv/
 # Logs
 *.log
 logs/
+
+# Agent skill directories (managed by abc sync)
+.claude/skills/
+.opencode/skills/
+.opencode/command/
+
+# Agentic Beacon (local only — not committed)
+.agentic-beacon/pending.yaml

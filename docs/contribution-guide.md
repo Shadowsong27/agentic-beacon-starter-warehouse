@@ -1,4 +1,4 @@
-# Contributing to Starter Org Warehouse
+# Contributing to Your Organization Warehouse
 
 ## How to Contribute
 
@@ -21,9 +21,10 @@
 # Test distribution
 cd ~/test-project
 abc warehouse connect --path ~/path/to/this-warehouse
-abc setup --manual
+abc setup
+abc adopt
 abc sync
-abc status
+abc warehouse status
 ```
 
 ### 4. Submit PR
